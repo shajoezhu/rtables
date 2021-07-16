@@ -1,0 +1,5 @@
+requests==2.26.0
+PyGithub==1.55
+yamale==3.0.7
+PyYAML==5.4.1
+loguru==0.5.3

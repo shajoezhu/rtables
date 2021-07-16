@@ -1,0 +1,99 @@
+## Github migration schema and reference
+
+---
+# Source: Where the various github objects originate
+source:
+  # API base URL for the source Github instance
+  base_url: regex("^(https?)://[^\s/$.?#].[^\s]*$", 'source api url')
+  # Organization, username, or owner where the objects currently reside
+  owner: str(required=True)
+  # Name of the environment variable from which the 
+  # Github PAT is obtained for making API requests
+  # in order to retrieve the migration objects
+  token_env_var: str(required=True)
+  # Repositories to migrate
+  repositories: list(str())
+
+# Destination: Where you want to migrate to
+destination:
+  # API base URL for the destination Github instance
+  base_url: regex("^(https?)://[^\s/$.?#].[^\s]*$", 'destination api url')
+  # Organization, username, or owner where the objects will reside post migration
+  owner: str(required=True)
+  # Name of the environment variable from which the 
+  # Github PAT is obtained for making API requests
+  # in order to copy over the migration objects
+  token_env_var: str(required=True)
+
+# Issues: Migration strategy for issues
+issues:
+  # Whether to migrate issues
+  migrate: bool(required=True)
+  # The state or status of the issue which need to be migrated
+  # from source to destination
+  state: regex("open|closed|all", 'issue state to migrate')
+  # Add a supplemental message to the issue body
+  # which conveys the provenance information pertaining
+  # to the original issue
+  add_provenance: bool(required=True)
+  # Migrate only those issues which have
+  # specified labels attached to them
+  labels: list(str())
+  # Handle sensitive information prior to migrating
+  # the issue to the destination
+  sensitive_info:
+    redact: bool(required=True)
+    regexes: list(str())
+  # Migrate issues that were created by only
+  # the specified users
+  authors: list(str())
+  # Close the source issue after successful migration
+  # from source to destination
+  close_on_migrate: bool(required=True)
+  # Strategy pertaining to labels
+  
+# Labels: Migration strategy for milestones
+labels:
+  # Whether to migrate labels
+  migrate: bool(required=True)
+
+# Milestones: Migration strategy for milestones
+milestones:
+  # Whether to migrate miilestones
+  migrate: bool(required=True)
+  # The state or status of the milestones which need to be migrated
+  # from source to destination
+  state: regex("open|closed|all", 'milestone state to migrate')
+
+# Projects: Migration strategy for projects
+projects:
+  # Whether to migrate projects
+  migrate: bool(required=True)
+  # The state or status of the projects which need to be migrated
+  # from source to destination
+  state: regex("open|closed|all", 'project state to migrate')
+  # Add a supplemental card to the project
+  # which conveys the provenance information pertaining
+  # to the original project
+  add_provenance: bool(required=True)
+  # Handle sensitive information in the project body
+  # prior to migrating the project to the destination
+  sensitive_info:
+    redact: bool(required=True)
+    regexes: list(str())
+  # Close the source project after successful migration
+  # from source to destination
+  close_on_migrate: bool(required=True)
+  # Names of the projects to migrate
+  names: list(str())
+
+# Users: A source-destination mapping of usernames
+users: list(include('user'))
+
+---
+# Additional schema classes
+
+# A source-destination mapping of usernames
+user:
+  source: str()
+  destination: str()
