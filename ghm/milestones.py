@@ -39,16 +39,22 @@ class Milestones:
         Copy milestones to destination
         """
         for artifact in self.to_migrate:
+            repo = client.client.get_repo(f"{client.owner}/{artifact['repo']}")
             logger.info(
                 f"Copying milestones to {artifact['repo']} on {client.base_url}"
             )
-            repo = client.client.get_repo(f"{client.owner}/{artifact['repo']}")
             for milestone in artifact["milestones"]:
-                repo.create_milestone(
-                    title=milestone.title,
-                    state=milestone.state,
-                    description=milestone.description,
-                )
-                logger.debug(
-                    f"Copied {milestone.title} to {repo.full_name} on {client.base_url}"
-                )
+                try:
+                    repo.create_milestone(
+                        title=milestone.title,
+                        state=milestone.state,
+                        description=milestone.description,
+                    )
+                    logger.debug(
+                        f"Copied {milestone.title} to {repo.full_name} on {client.base_url}"
+                    )
+                except:
+                    logger.warning(
+                        f"{milestone.title} already exists on {repo.full_name} on {client.base_url}"
+                    )
+                    pass

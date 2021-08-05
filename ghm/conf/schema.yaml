@@ -36,9 +36,6 @@ issues:
   # which conveys the provenance information pertaining
   # to the original issue
   add_provenance: bool(required=True)
-  # Migrate only those issues which have
-  # specified labels attached to them
-  labels: list(str())
   # Handle sensitive information prior to migrating
   # the issue to the destination
   sensitive_info:
@@ -49,9 +46,11 @@ issues:
   authors: list(str())
   # Close the source issue after successful migration
   # from source to destination
-  close_on_migrate: bool(required=True)
-  # Strategy pertaining to labels
-  
+  lock_on_migrate: bool(required=True)
+  # Add a "migrated" label to the issue
+  # after it has been migrated
+  add_migrated_label: bool(required=True)
+
 # Labels: Migration strategy for milestones
 labels:
   # Whether to migrate labels

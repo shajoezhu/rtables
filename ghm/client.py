@@ -37,15 +37,3 @@ class Client:
         for repo in self.repo_names:
             self.repositories.append(self.client.get_repo(f"{self.owner}/{repo}"))
         logger.debug(f"Obtained {len(self.repositories)} repos from {self.base_url}")
-
-    @limits(calls=30, period=30)
-    def get_user(self, username):
-        """
-        Get user object
-        """
-        try:
-            logger.debug(f"Getting user info for {username} from {self.base_url}")
-            return self.client.get_user(username)
-        except:
-            logger.critical(f"Error getting {username} from {self.base_url}")
-            raise

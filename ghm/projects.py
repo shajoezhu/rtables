@@ -34,11 +34,12 @@ class Projects:
                 f"Obtained {self.projects.totalCount} projects from {client.org.name}"
             )
 
-    def transform(self):
+    def transform(self, users):
         """
         Prep objects for loading to destination
         Redact sensitive content
         Add provenance info
+        Update user references
         """
         self.to_migrate = []
         for project in self.projects:
@@ -52,17 +53,18 @@ class Projects:
                 # Redact sensitive content
                 if self.sensitive_info["redact"] and self.sensitive_info["regexes"]:
                     for r in self.sensitive_info["regexes"]:
-                        new_body = re.sub(r, "<redacted>", new_body)
+                        new_body = re.sub(r, "<REDACTED>", new_body)
                 # Add provenance message
                 if self.add_provenance:
                     new_body = (
                         new_body
                         + "\n\nProvenance: \n```\n"
-                        + f"Origin: {project.html_url}\n"
-                        + f"Creator: {project.creator.name}\n"
-                        + f"Created at: {project.created_at}\n"
+                        + f"Creator: {project.creator.login}\n"
                         + "```"
                     )
+                # Update project body with destination user info
+                for user in users:
+                    new_body = re.sub(user["source"], user["destination"], new_body)
                 # Create migration artifact
                 self.to_migrate.append(
                     {"name": project.name, "body": new_body, "columns": columns}
@@ -83,3 +85,17 @@ class Projects:
                     f"Copying column {column.name} to {artifact['name']} on {client.owner}"
                 )
                 project.create_column(name=column.name)
+
+    @limits(calls=50, period=30)
+    def cleanup(self, client):
+        """
+        Post migration cleanup
+        """
+        for project in self.projects:
+            if self.close_on_migrate and project.name in self.names:
+                logger.info(f"Closing {project.name} on {client.base_url}")
+                project.edit(
+                    name=f"[Migrated] {project.name}",
+                    body=f"# This project has been migrated\n\n{project.body}",
+                    state="closed",
+                )

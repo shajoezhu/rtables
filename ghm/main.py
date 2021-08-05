@@ -1,6 +1,5 @@
 from ghm.client import Client
 from ghm.config import Config
-from ghm.users import Users
 from ghm.issues import Issues
 from ghm.projects import Projects
 from ghm.labels import Labels
@@ -14,10 +13,6 @@ def main(config_file):
     # Init clients
     source_client = Client(config.source)
     dest_client = Client(config.destination)
-
-    # Get users
-    source_users = Users(config.users, filter="source", client=source_client)
-    dest_users = Users(config.users, filter="destination", client=dest_client)
 
     # Get issues from source
     issues = Issues(config.issues)
@@ -36,12 +31,18 @@ def main(config_file):
     labels.get(source_client)
 
     # Copy projects to destination
-    projects.transform()
+    projects.transform(config.users)
     projects.copy(dest_client)
 
     # Copy milestones to destination
     milestones.copy(dest_client)
 
     # Copy issues to destination
-    issues.transform()
+    issues.transform(config.users)
     issues.copy(dest_client)
+
+    # Cleanup projects
+    projects.cleanup(source_client)
+
+    # Cleanup issues
+    issues.cleanup(source_client)

@@ -1,7 +1,7 @@
 import re
 from loguru import logger
 from ratelimit import limits
-
+import time
 
 class Issues:
     """
@@ -15,14 +15,16 @@ class Issues:
         self.migrate = config.get("migrate")
         self.state = config.get("state")
         self.add_provenance = config.get("add_provenance")
-        self.labels = config.get("labels")
 
         self.sensitive_info = config.get("sensitive_info")
 
         self.authors = config.get("authors")
-        self.close_on_migrate = config.get("close_on_migrate")
 
-    @limits(calls=50, period=30)
+        self.lock_on_migrate = config.get("lock_on_migrate")
+
+        self.add_migrated_label = config.get("add_migrated_label")
+
+    @limits(calls=30, period=30)
     def get(self, client):
         """
         Get issues and comments
@@ -36,7 +38,7 @@ class Issues:
             for issue in issues:
                 comments = issue.get_comments()
                 logger.debug(
-                    f"Issue ID {issue.id} in {repo.name} on {client.base_url} has {comments.totalCount} comments"
+                    f"#{issue.id} in {repo.name} on {client.base_url} has {comments.totalCount} comments"
                 )
                 self.issues.append(
                     {
@@ -46,12 +48,12 @@ class Issues:
                     }
                 )
 
-    def transform(self):
+    def transform(self, users):
         """
         Filter issues based on authors
-        Filter issues based on labels
         Add provenance information
         Redact sensitive content from issue body and comments
+        Add the migrated label to the source issue
         """
         self.to_migrate = []
         for issue in self.issues:
@@ -59,23 +61,24 @@ class Issues:
             i = issue["issue"]
             body = i.body
             author = i.user.login
-            labels = [l.name for l in i.labels]
             logger.info(f"Processing issue body data for {i.title} on {repo}")
-            # Filter based on authors and labels
-            if author in self.authors and any(l in self.labels for l in labels):
+            # Filter based on authors, and do not migrate migrated issues
+            if author in self.authors and "migrated" not in [x.name for x in i.labels]:
                 # Redact sensitive content from issue body
                 if self.sensitive_info["redact"] and self.sensitive_info["regexes"]:
                     for r in self.sensitive_info["regexes"]:
-                        body = re.sub(r, "<redacted>", body)
+                        body = re.sub(r, "<REDACTED>", body)
                 # Add provenance message to issue body
                 if self.add_provenance:
                     body = (
                         body
                         + "\n\nProvenance: \n```\n"
-                        + f"Origin: {i.html_url}\n"
-                        + f"Creator: {i.user.name}\n"
+                        + f"Creator: {i.user.login}\n"
                         + "```"
                     )
+                # Replace author mentions
+                for user in users:
+                    body = re.sub(user["source"], user["destination"], body)
                 updated_comments = []
                 logger.debug(f"Processing comment data for {i.title} on {repo}")
                 for comment in issue["comments"]:
@@ -83,10 +86,24 @@ class Issues:
                     # Redact sensitive content from comment body
                     if self.sensitive_info["redact"] and self.sensitive_info["regexes"]:
                         for r in self.sensitive_info["regexes"]:
-                            comment_body = re.sub(r, "<redacted>", comment_body)
+                            comment_body = re.sub(r, "<REDACTED>", comment_body)
+                    # Add provenance message to issue comments
+                    if self.add_provenance:
+                        comment_body = (
+                            comment_body
+                            + "\n\nProvenance: \n```\n"
+                            + f"Creator: {comment.user.login}\n"
+                            + "```"
+                        )
+                    # Replace author mentions
+                    for user in users:
+                        comment_body = re.sub(
+                            user["source"], user["destination"], comment_body
+                        )
                     updated_comments.append(comment_body)
                 self.to_migrate.append(
                     {
+                        "number": i.number,
                         "repo": repo,
                         "title": i.title,
                         "body": body,
@@ -96,6 +113,7 @@ class Issues:
                     }
                 )
 
+    @limits(calls=10, period=30)
     def copy(self, client):
         """
         Copy issue body and comments to repo
@@ -113,8 +131,32 @@ class Issues:
             logger.debug(
                 f"Copied {i['title']} to {repo.full_name} on {client.base_url}"
             )
+            time.sleep(2)
             for comment in i["comments"]:
                 issue.create_comment(comment)
                 logger.debug(
                     f"Added comment to {i['title']} on {repo.full_name} on {client.base_url}"
                 )
+                time.sleep(3)
+
+    @limits(calls=50, period=30)
+    def cleanup(self, client):
+        """
+        Post migration cleanup
+        """
+        for i in self.to_migrate:
+            repo = client.client.get_repo(f"{client.owner}/{i['repo']}")
+            issue = repo.get_issue(i["number"])
+            if self.add_migrated_label:
+                logger.info(
+                    f"Adding 'migrated' label to issue #{i['number']} on {i['repo']} on {client.base_url}"
+                )
+                issue.add_to_labels("migrated")
+            if self.lock_on_migrate:
+                logger.info(
+                    f"Locking issue #{i['number']} on {i['repo']} on {client.base_url}"
+                )
+                issue.create_comment(
+                    "## This issue is now locked as it has been migrated."
+                )
+                issue.lock("resolved")

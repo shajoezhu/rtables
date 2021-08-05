@@ -37,25 +37,22 @@ issues:
   # which conveys the provenance information pertaining
   # to the original issue
   add_provenance: true
-  # Migrate only those issues which have
-  # specified labels attached to them
-  labels:
-    - devops
-    - enhancement
   # Handle sensitive information prior to migrating
   # the issue to the destination
   sensitive_info:
     redact: true
     regexes:
-      - github.roche.com
+      - '(?:https?://)?(?:www[.])?.*[.]roche[.]com/+'
+      - 'https://docs.google.com/(spreadsheets|document)/d/([a-zA-Z0-9-_]+)'
   # Migrate issues that were created by only
   # the specified users
   authors:
     - dinakar29
-  # Close the source issue after successful migration
+  # Lock the source issue after successful migration
   # from source to destination
-  close_on_migrate: false
-  
+  lock_on_migrate: true
+  # Add the "migrated" label to the issue after migration
+  add_migrated_label: true
   
 # Strategy pertaining to labels
 labels:
@@ -78,10 +75,11 @@ projects:
   sensitive_info:
     redact: true
     regexes:
-      - "github.roche.com"
+      - '(?:https?://)?(?:www[.])?.*[.]roche[.]com/+'
+      - 'https://docs.google.com/(spreadsheets|document)/d/([a-zA-Z0-9-_]+)'
   # Close the source project after successful migration
   # from source to destination
-  close_on_migrate: false
+  close_on_migrate: true
   # Project names that need to be migrated
   names:
     - 'Ignore me'
