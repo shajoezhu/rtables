@@ -13,8 +13,8 @@ source:
   token_env_var: GITHUB_ROCHE_TOKEN
   # Repositories to migrate
   repositories:
-    - utils.nest
-    - ggplot2.utils
+    #- utils.nest
+    #- ggplot2.utils
     - goshawk
     - hermes
     - osprey
@@ -63,32 +63,19 @@ issues:
   # Migrate issues that were created by only
   # the specified users
   authors:
-    # Core Dev
-    - ruckip
-    - voicus
-    - kaledkod
-    - nasinskm
-    - zhaoj88
-    - PAGACZK
-    - hallalm
-    # SME
-    - stoilovs
-    - liy396
-    - zubizari
-    - bahatsky
-    - wojciakw
-    - npaszty
-    - liuq36
-    - jaminiof
-    # Biomarker
-    - luongj3
-    - zhanl238
-    - bhatian3
-    - bieners1
-    - haochenl
-    - sabanesd
-    # Innovation
-    - waddella
+    - junlue
+    - guimarad
+    - burkoffn
+    - collinf1
+    - wolowskv
+    - remusatp
+    - slamao
+    - wolfs25
+    - harric17
+    - palangaa
+    - neitmant
+    - SUNDRELV
+    - martik32
   # Add the "migrated" label to the issue after migration
   add_migrated_label: true
   # Lock the source issue after successful migration
@@ -176,6 +163,8 @@ users:
     destination: fanooel
   - source: bargielk
     destination: KlaudiaBB
+  - source: burkoffn
+    destination: nikolas-burkoff
 
 # Move milestones
 milestones:

@@ -2,6 +2,8 @@ import re
 from loguru import logger
 from ratelimit import limits
 import time
+import github
+
 
 class Issues:
     """
@@ -120,12 +122,17 @@ class Issues:
         """
         for i in self.to_migrate:
             # Create the issues
-            logger.info(f"Copying issues to {i['repo']} on {client.base_url}")
+            logger.info(
+                f"Copying issue {i['title']} to {i['repo']} on {client.base_url}"
+            )
             repo = client.client.get_repo(f"{client.owner}/{i['repo']}")
+            milestone = i["milestone"]
+            if not isinstance(milestone, github.Milestone.Milestone):
+                milestone = github.GithubObject.NotSet
             issue = repo.create_issue(
                 title=i["title"],
                 body=i["body"],
-                # milestone=i["milestone"], # TODO: Convert this to a milestone object
+                # milestone=milestone, ## TODO: Figure out milestones
                 labels=i["labels"],
             )
             logger.debug(

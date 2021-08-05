@@ -13,22 +13,7 @@ source:
   token_env_var: GITHUB_ROCHE_TOKEN
   # Repositories to migrate
   repositories:
-    - utils.nest
-    - ggplot2.utils
-    - goshawk
-    - hermes
-    - osprey
-    - random.cdisc.data
-    - scda
-    - scda.2021
-    - teal.devel
-    - teal.goshawk
-    - teal.modules.clinical
-    - teal.modules.general
-    - teal.modules.hermes
-    - teal.osprey
-    - tern
-    - test.nest
+    - teal
 
 # Destination: Where you want to migrate to
 destination:
@@ -68,7 +53,7 @@ issues:
     - voicus
     - kaledkod
     - nasinskm
-    - zhaoj88
+    - junlue
     - PAGACZK
     - hallalm
     # SME
@@ -89,6 +74,19 @@ issues:
     - sabanesd
     # Innovation
     - waddella
+    # Others
+    - guimarad
+    - burkoffn
+    - collinf1
+    - wolowskv
+    - remusatp
+    - slamao
+    - wolfs25
+    - harric17
+    - palangaa
+    - neitmant
+    - SUNDRELV
+    - martik32
   # Add the "migrated" label to the issue after migration
   add_migrated_label: true
   # Lock the source issue after successful migration

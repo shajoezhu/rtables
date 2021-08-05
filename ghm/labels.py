@@ -2,6 +2,7 @@ from loguru import logger
 from ratelimit import limits
 import time
 
+
 class Labels:
     """
     Labels
