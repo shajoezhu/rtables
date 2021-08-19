@@ -64,6 +64,11 @@ milestones:
   # from source to destination
   state: regex("open|closed|all", 'milestone state to migrate')
 
+# Releases: Migration strategy for releases
+releases:
+  # Whether to migrate releases
+  migrate: bool(required=True)
+
 # Projects: Migration strategy for projects
 projects:
   # Whether to migrate projects

@@ -32,23 +32,26 @@ class Issues:
         Get issues and comments
         """
         self.issues = []
-        # Get all issues and comments from all repos
-        for repo in client.repositories:
-            logger.info(f"Getting issues from {repo.name} on {client.base_url}")
-            issues = repo.get_issues(state=self.state)
-            logger.debug(f"Obtained {issues.totalCount} issues from {client.base_url}")
-            for issue in issues:
-                comments = issue.get_comments()
+        if self.migrate:
+            # Get all issues and comments from all repos
+            for repo in client.repositories:
+                logger.info(f"Getting issues from {repo.name} on {client.base_url}")
+                issues = repo.get_issues(state=self.state)
                 logger.debug(
-                    f"#{issue.id} in {repo.name} on {client.base_url} has {comments.totalCount} comments"
+                    f"Obtained {issues.totalCount} issues from {client.base_url}"
                 )
-                self.issues.append(
-                    {
-                        "repo": repo.name,
-                        "issue": issue,
-                        "comments": comments,
-                    }
-                )
+                for issue in issues:
+                    comments = issue.get_comments()
+                    logger.debug(
+                        f"#{issue.id} in {repo.name} on {client.base_url} has {comments.totalCount} comments"
+                    )
+                    self.issues.append(
+                        {
+                            "repo": repo.name,
+                            "issue": issue,
+                            "comments": comments,
+                        }
+                    )
 
     def transform(self, users):
         """

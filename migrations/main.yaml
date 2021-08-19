@@ -99,6 +99,10 @@ issues:
 labels:
   migrate: true
 
+# Strategy pertaining to releases
+releases:
+  migrate: false
+
 # Projects: Migration strategy for projects
 projects:
   # Whether to migrate projects

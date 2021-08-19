@@ -7,21 +7,38 @@ source:
   base_url: https://github.roche.com/api/v3
   # Organization, username, or owner where the objects currently reside
   owner: NEST
-  # Name of the environment variable from which the 
+  # Name of the environment variable from which the
   # Github PAT is obtained for making API requests
   # in order to retrieve the migration objects
   token_env_var: GITHUB_ROCHE_TOKEN
   # Repositories to migrate
   repositories:
-    - r2stream
+    - utils.nest
+    - ggplot2.utils
+    - goshawk
+    - hermes
+    - osprey
+    - random.cdisc.data
+    - scda
+    - scda.2021
+    - teal.devel
+    - teal.goshawk
+    - teal.modules.clinical
+    - teal.modules.general
+    - teal.modules.hermes
+    - teal.osprey
+    - tern
+    - test.nest
+    - teal
 
 # Destination: Where you want to migrate to
 destination:
   # API base URL for the destination Github instance
   base_url: https://api.github.com
-  # Organization, username, or owner where the objects will reside post migration
+  # Organization, username, or owner where
+  # the objects will reside post migration
   owner: insightsengineering
-  # Name of the environment variable from which the 
+  # Name of the environment variable from which the
   # Github PAT is obtained for making API requests
   # in order to copy over the migration objects
   token_env_var: GITHUB_TOKEN
@@ -29,14 +46,14 @@ destination:
 # Issues: Migration strategy for issues
 issues:
   # Whether to migrate issues
-  migrate: true
+  migrate: false
   # The state or status of the issue which need to be migrated
   # from source to destination
   state: open
   # Add a supplemental message to the issue body
   # which conveys the provenance information pertaining
   # to the original issue
-  add_provenance: true
+  add_provenance: false
   # Handle sensitive information prior to migrating
   # the issue to the destination
   sensitive_info:
@@ -48,50 +65,51 @@ issues:
   # the specified users
   authors:
     - dinakar29
+  # Add the "migrated" label to the issue after migration
+  add_migrated_label: false
   # Lock the source issue after successful migration
   # from source to destination
-  lock_on_migrate: true
-  # Add the "migrated" label to the issue after migration
-  add_migrated_label: true
-  
+  lock_on_migrate: false
+
 # Strategy pertaining to labels
 labels:
-  migrate: true
+  migrate: false
 
 # Strategy pertaining to releases
 releases:
-  migrate: false
+  migrate: true
 
 # Projects: Migration strategy for projects
 projects:
   # Whether to migrate projects
-  migrate: true
+  migrate: false
   # The state or status of the projects which need to be migrated
   # from source to destination
   state: open
   # Add a supplemental card to the project
   # which conveys the provenance information pertaining
   # to the original project
-  add_provenance: true
+  add_provenance: false
   # Handle sensitive information in the project body
   # prior to migrating the project to the destination
   sensitive_info:
-    redact: true
+    redact: false
     regexes:
       - '(?:https?://)?(?:www[.])?.*[.]roche[.]com/+'
       - 'https://docs.google.com/(spreadsheets|document)/d/([a-zA-Z0-9-_]+)'
   # Close the source project after successful migration
   # from source to destination
-  close_on_migrate: true
+  close_on_migrate: false
   # Project names that need to be migrated
   names:
-    - 'Ignore me'
+    - 'Core Development Backlog'
 
 # Users: A source-destination mapping of usernames
 users:
   - source: dinakar29
     destination: dinakar29
 
+# Move milestones
 milestones:
-  migrate: true
+  migrate: false
   state: open

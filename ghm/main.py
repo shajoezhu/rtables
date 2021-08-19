@@ -4,6 +4,7 @@ from ghm.issues import Issues
 from ghm.projects import Projects
 from ghm.labels import Labels
 from ghm.milestones import Milestones
+from ghm.releases import Releases
 
 
 def main(config_file):
@@ -30,6 +31,10 @@ def main(config_file):
     labels = Labels(config.labels)
     labels.get(source_client)
 
+    # Get releases from source
+    releases = Releases(config.releases)
+    releases.get(source_client)
+
     # Copy projects to destination
     projects.transform(config.users)
     projects.copy(dest_client)
@@ -40,6 +45,9 @@ def main(config_file):
     # Copy issues to destination
     issues.transform(config.users)
     issues.copy(dest_client)
+
+    # Copy releases to destination
+    releases.copy(dest_client)
 
     # Cleanup projects
     projects.cleanup(source_client)

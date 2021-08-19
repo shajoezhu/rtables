@@ -32,6 +32,8 @@ class Config:
         self.labels = conf["labels"]
         # Milestones
         self.milestones = conf["milestones"]
+        # Releases
+        self.releases = conf["releases"]
 
     def load(self):
         """
