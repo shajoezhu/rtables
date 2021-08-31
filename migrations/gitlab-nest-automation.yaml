@@ -1,0 +1,196 @@
+## Github migration schema and reference
+
+---
+# Source: Where the various github objects originate
+source:
+  # API base URL for the source Github instance
+  base_url: https://github.roche.com/api/v3
+  # Organization, username, or owner where the objects currently reside
+  owner: NEST-automation
+  # Name of the environment variable from which the
+  # Github PAT is obtained for making API requests
+  # in order to retrieve the migration objects
+  token_env_var: GITHUB_ROCHE_TOKEN
+  # Repositories to migrate
+  repositories:
+    - Rocker_docker_images
+    - dark-side-scripts
+    - BEE_docker_images
+    - integration-tests
+    - hugo-theme-release-docs
+    - enableR_docker_images
+
+# Destination: Where you want to migrate to
+destination:
+  # API base URL for the destination Github instance
+  base_url: https://api.github.com
+  # Organization, username, or owner where
+  # the objects will reside post migration
+  owner: insightsengineering
+  # Name of the environment variable from which the
+  # Github PAT is obtained for making API requests
+  # in order to copy over the migration objects
+  token_env_var: GITHUB_TOKEN
+
+# Issues: Migration strategy for issues
+issues:
+  # Whether to migrate issues
+  migrate: true
+  # The state or status of the issue which need to be migrated
+  # from source to destination
+  state: open
+  # Add a supplemental message to the issue body
+  # which conveys the provenance information pertaining
+  # to the original issue
+  add_provenance: true
+  # Handle sensitive information prior to migrating
+  # the issue to the destination
+  sensitive_info:
+    redact: false
+    regexes:
+      - '(?:https?://)?(?:www[.])?.*[.]roche[.]com/+'
+      - 'https://docs.google.com/(spreadsheets|document)/d/([a-zA-Z0-9-_]+)'
+  # Migrate issues that were created by only
+  # the specified users
+  authors:
+    # Core Dev
+    - ruckip
+    - voicus
+    - kaledkod
+    - nasinskm
+    - zhaoj88
+    - PAGACZK
+    - hallalm
+    # SME
+    - stoilovs
+    - liy396
+    - zubizari
+    - bahatsky
+    - wojciakw
+    - npaszty
+    - liuq36
+    - jaminiof
+    # Biomarker
+    - luongj3
+    - zhanl238
+    - bhatian3
+    - bieners1
+    - haochenl
+    - sabanesd
+    # Innovation
+    - waddella
+    - laxamanj
+    - wangh107
+    - chohans
+    - lil128
+    - yany2
+    - mattielf
+    - junlue
+    - guimarad
+    - burkoffn
+    - collinf1
+    - wolowskv
+    - remusatp
+    - slamao
+    - wolfs25
+    - harric17
+    - palangaa
+    - neitmant
+    - SUNDRELV
+    - martik32
+  # Add the "migrated" label to the issue after migration
+  add_migrated_label: true
+  # Lock the source issue after successful migration
+  # from source to destination
+  lock_on_migrate: true
+
+# Strategy pertaining to labels
+labels:
+  migrate: true
+
+# Strategy pertaining to releases
+releases:
+  migrate: true
+
+# Projects: Migration strategy for projects
+projects:
+  # Whether to migrate projects
+  migrate: false
+  # The state or status of the projects which need to be migrated
+  # from source to destination
+  state: open
+  # Add a supplemental card to the project
+  # which conveys the provenance information pertaining
+  # to the original project
+  add_provenance: true
+  # Handle sensitive information in the project body
+  # prior to migrating the project to the destination
+  sensitive_info:
+    redact: false
+    regexes:
+      - '(?:https?://)?(?:www[.])?.*[.]roche[.]com/+'
+      - 'https://docs.google.com/(spreadsheets|document)/d/([a-zA-Z0-9-_]+)'
+  # Close the source project after successful migration
+  # from source to destination
+  close_on_migrate: false
+  # Project names that need to be migrated
+  names:
+    - 'Core Development Backlog'
+
+# Users: A source-destination mapping of usernames
+users:
+  - source: sabanesd
+    destination: danielinteractive
+  - source: waddella
+    destination: waddella
+  - source: ruckip
+    destination: pawelru
+  - source: stoilovs
+    destination: anajens
+  - source: luongj3
+    destination: luongj3
+  - source: zhanl238
+    destination: codesformochi
+  - source: bhatian3
+    destination: namratabhatia
+  - source: liy396
+    destination: yli110-stat697
+  - source: voicus
+    destination: sorinvoicu
+  - source: zubizari
+    destination: imazubi
+  - source: dinakar29
+    destination: dinakar29
+  - source: kaledkod
+    destination: gogonzo
+  - source: bieners1
+    destination: bienerts
+  - source: nasinskm
+    destination: Polkas
+  - source: bahatsky
+    destination: bahatsky
+  - source: wojciakw
+    destination: wwojciech
+  - source: haochenl
+    destination: colinisstudent
+  - source: zhaoj88
+    destination: junlueZH
+  - source: PAGACZK
+    destination: kpagacz
+  - source: npaszty
+    destination: npaszty
+  - source: hallalm
+    destination: mhallal1
+  - source: wangx216
+    destination: wangx216
+  - source: czernecb
+    destination: bczernecki
+  - source: WOZNIAK4
+    destination: fanooel
+  - source: bargielk
+    destination: KlaudiaBB
+
+# Move milestones
+milestones:
+  migrate: true
+  state: open
